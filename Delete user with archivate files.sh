@@ -5,7 +5,7 @@ usage(){ # функция которая выполняется если в ар
 echo "usage: ${0} [-dra] usre [USERN]..." >&2
 echo ' -d DELETE' >&2
 echo ' -r REMOVE' >&2
-echo ' -a ARCHIVE' >&2
+echo ' -a ARCHIVE' >&2#
 exit 1
 }
 
