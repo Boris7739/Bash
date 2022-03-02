@@ -4,8 +4,8 @@ then
   echo "You mast be root for doing that"
   exit 1
 fi
-path='/etc/logrotate.d/server10.log'
-read -p 'Write path what would be logging: ' log
+path='/etc/logrotate.d/server10.log' # Храняться настройки для Ротации логов
+read -p 'Write path what would be logging: ' log # То, какой файл будем использовать
 
 
 usage(){ 
@@ -19,12 +19,12 @@ echo ' -m monthly - каждый месяц;' >&2
 exit 1
 }
 
-if [[ ! -e "${path}" ]]
+if [[ ! -e "${path}" ]] # Проверка на существование server10.log
 then 
   echo "we have no file ${path} Please use -f option for indicate it. When print any other option."
   exit 1
 fi
-if [[ ! -e "${log}" ]]
+if [[ ! -e "${log}" ]] # Проверка на существование файла логов
 then 
   echo "we have no file ${log} Please use -f option for indicate it"
   exit 1
@@ -42,7 +42,7 @@ do
   esac
 done
 # shift "$(( OPTIND -1 ))"
-if [[ "${#}" -lt 1 ]] # если мы передали меньше (-lt 1) аргумента "${#}" -считает колво аргументов. То использовать функцию дл\ выхода из скрипта
+if [[ "${#}" -lt 1 ]] # если мы передали меньше (-lt 1) аргумента "${#}" -считает колво аргументов, То использовать функцию дл\ выхода из скрипта
 then
   echo '=====Use one of usage arguments.===== '
   usage
@@ -60,7 +60,7 @@ for arg in "${@}"
 do
   if [[ ${hourly} = 'true' ]]
   then 
-    echo "${log}{" > ${path}
+    echo "${log}{" > ${path} # Добаляем название нашего лог файла в server10.log и открывающий тег
     echo 'hourly' >> ${path}
   fi
   echo '1'	
@@ -84,10 +84,10 @@ do
   echo 'Script done.'
   echo 'rotate 4' >> ${path}
   echo "maxage ${time}" >> ${path} 
-  echo '}' >> ${path}
+  echo '}' >> ${path} # Добаляем закрывающий тег в конце
   count_string=$(wc -l "${path}")
   echo "${count_string}"
-  if [[ "${count_string}" != '5 /etc/logrotate.d/server10.log' ]]
+  if [[ "${count_string}" != '5 /etc/logrotate.d/server10.log' ]] # Проверка на добавление строк в файл
   then
     echo 'Check your file or restart you script with other params. There are something wrong.'
   fi   
