@@ -85,9 +85,9 @@ do
   echo 'rotate 4' >> ${path}
   echo "maxage ${time}" >> ${path} 
   echo '}' >> ${path} # Добаляем закрывающий тег в конце
-  count_string=$(wc -l "${path}")
+  count_string=$(wc -l < ${path})
   echo "${count_string}"
-  if [[ "${count_string}" != '5 /etc/logrotate.d/server10.log' ]] # Проверка на добавление строк в файл
+  if [[ "${count_string}" != '5' ]] # Проверка на добавление строк в файл
   then
     echo 'Check your file or restart you script with other params. There are something wrong.'
   fi   
