@@ -9,6 +9,7 @@ read -p 'Write path what would be logging: ' log # То, какой файл б�
 
 
 usage(){ 
+echo "Write Rotate arg in begin script"
 echo 'Transfer the argument to script.'
 echo "usage: ${0} [-h, -d, -w, -m] [-f FILE]" >&2
 #echo ' -f path to log' >&2
@@ -18,6 +19,26 @@ echo ' -w weekly - каждую неделю;' >&2
 echo ' -m monthly - каждый месяц;' >&2
 exit 1
 }
+
+
+while getopts "hdwmf:" OPTION # : f- может принимат собственные аргументы. выступает отдельно. 
+do
+  case ${OPTION} in # специальная переменная для передоваемых аргументов
+  f) path="$OPTARG";; # в нашем случае меняет лог файл с которым будет работать
+  h) hourly="true";;
+  d) dayly="true";;
+  w) weekly="true";;
+  m) monthly="true";;
+  ?) usage ;;
+  esac
+done
+# shift "$(( OPTIND -1 ))"
+if [[ "${#}" -lt 1 ]] # если мы передали меньше (-lt 1) аргумента "${#}" -считает колво аргументов, То использовать функцию дл\ выхода из скрипта
+then
+  echo '=====Use one of usage arguments.===== '
+  usage
+  exit 1
+fi
 
 if [[ ! -e "${path}" ]] # Проверка на существование server10.log
 then 
@@ -30,66 +51,53 @@ then
   exit 1
 fi
 
-while getopts f:hdwm OPTION # : f- может принимат собственные аргументы. выступает отдельно. 
-do
-  case ${OPTION} in # специальная переменная для передоваемых аргументов
-  f) path="$OPTARG";; # в нашем случае меняет лог файл с которым будет работать
-  h) hourly='true' ;;
-  d) daily='true' ;;
-  w) weekly='true' ;;
-  m) monthly='true' ;;
-  ?) usage ;;
-  esac
-done
-# shift "$(( OPTIND -1 ))"
-if [[ "${#}" -lt 1 ]] # если мы передали меньше (-lt 1) аргумента "${#}" -считает колво аргументов, То использовать функцию дл\ выхода из скрипта
+
+if [[ "${#}" -gt 3 ]] # если мы передали больше (-gt 2) аргумента "${#}" -считает колво аргументов. То использовать функцию дл\ выхода из скрипта
 then
-  echo '=====Use one of usage arguments.===== '
-  usage
-  exit 1
-fi
-if [[ "${#}" -gt 2 ]] # если мы передали больше (-gt 2) аргумента "${#}" -считает колво аргументов. То использовать функцию дл\ выхода из скрипта
-then
-  echo 'Use one of usage arguments '
+  echo 'There is too many arguments '
   usage
   exit 1
 fi
 echo "${@} is arg"
+args="${@}"
+echo "$args"
+find_arg="$(echo "$args"|cut -d ' ' -f1)"
+echo "${find_arg}"
 read -p "Set OPTION maxage (write number) " time
-for arg in "${@}"
+for arg in ${@}
 do
-  if [[ ${hourly} = 'true' ]]
-  then 
+  if [[ ${hourly} = "true" ]]
+  then
     echo "${log}{" > ${path} # Добаляем название нашего лог файла в server10.log и открывающий тег
     echo 'hourly' >> ${path}
   fi
-  echo '1'	
-  if [[ "${dayly}" = 'true' ]]
-  then 
+  echo '1'
+  if [[ ${dayly} = "true" ]]
+  then
     echo "${log}{" > ${path}
     echo 'daily' >> ${path}
   fi
   echo '2'
-  if [[ "${weekly}" = 'true' ]]
-  then 
+  if [[ ${weekly} = "true" ]]
+  then
     echo "${log}{" > ${path}
     echo 'weekly' >> ${path}
   fi
   echo '3'
-  if [[ "${monthly}" = 'true' ]]
-  then 
+  if [[ ${monthly} = "true" ]]
+  then
     echo "${log}{" > ${path}
-    echo 'monthly' >> ${path}  
+    echo 'monthly' >> ${path}
   fi
   echo 'Script done.'
   echo 'rotate 4' >> ${path}
-  echo "maxage ${time}" >> ${path} 
+  echo "maxage ${time}" >> ${path}
   echo '}' >> ${path} # Добаляем закрывающий тег в конце
   count_string=$(wc -l < ${path})
   echo "${count_string}"
   if [[ "${count_string}" != '5' ]] # Проверка на добавление строк в файл
   then
     echo 'Check your file or restart you script with other params. There are something wrong.'
-  fi   
-done 
+  fi
+done
 exit 0
